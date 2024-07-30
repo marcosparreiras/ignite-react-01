@@ -1,37 +1,56 @@
 import { Avatar } from "./Avatar";
 import { Comment } from "./Comment";
+import { format, formatDistanceToNow } from "date-fns";
 import styles from "./Post.module.css";
 
-export function Post() {
+type Props = {
+  auhtor: {
+    avatarUrl: string;
+    name: string;
+    role: string;
+  };
+  publishedAt: Date;
+  content: { type: string; content: string }[];
+};
+
+export function Post(props: Props) {
+  const publishedDateFormated = format(
+    props.publishedAt,
+    "d 'de' LLLL 'às' HHmm'h'"
+  );
+
+  const publishedDateRelativeToNow = formatDistanceToNow(props.publishedAt);
+
   return (
     <article className={styles.post}>
       <header>
         <div className={styles.author}>
-          <Avatar src="https://github.com/marcosparreiras.png" />
+          <Avatar src={props.auhtor.avatarUrl} />
           <div className={styles.authorInfo}>
-            <strong>Marcos Parreiras</strong>
-            <span>Web Developer</span>
+            <strong>{props.auhtor.name}</strong>
+            <span>{props.auhtor.role}</span>
           </div>
         </div>
-        <time title="29 de Julho às 23:28h" dateTime="2024-07-29 23:28:03">
-          Publicado há 1h
+        <time
+          title={publishedDateFormated}
+          dateTime={props.publishedAt.toISOString()}
+        >
+          {publishedDateRelativeToNow}
         </time>
       </header>
 
       <div className={styles.content}>
-        <p>Lorem ipsum dolor sit amet.</p>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque
-          pariatur officiis ab deleniti ducimus illum dolor rem tempore debitis
-          expedita, molestias possimus culpa. Eius expedita laborum omnis
-          accusantium, doloribus iusto!
-        </p>
-        <p>
-          <a href="#">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </a>
-        </p>
-        <p>Lorem, ipsum dolor.</p>
+        {props.content.length > 0 &&
+          props.content.map((row, index) => {
+            if (row.type === "link") {
+              return (
+                <p key={index}>
+                  <a href="#">{row.content}</a>
+                </p>
+              );
+            }
+            return <p key={index}>{row.content}</p>;
+          })}
       </div>
 
       <form className={styles.commentForm}>
