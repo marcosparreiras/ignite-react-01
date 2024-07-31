@@ -92,6 +92,11 @@
   max-height: none;
 }
 
+.commentForm button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .commentForm button[type="submit"] {
   padding: 1rem 1.5rem;
   margin-top: 1rem;
@@ -104,7 +109,7 @@
   transition: filter 0.15s;
 }
 
-.commentForm button[type="submit"]:hover {
+.commentForm button[type="submit"]:not(:disabled):hover {
   filter: brightness(1.3);
 }
 

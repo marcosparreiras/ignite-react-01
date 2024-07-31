@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Avatar } from "./Avatar";
 import { Comment } from "./Comment";
 import { format, formatDistanceToNow } from "date-fns";
@@ -14,12 +15,25 @@ type Props = {
 };
 
 export function Post(props: Props) {
+  const [comments, setComments] = useState<string[]>([]);
+  const [newCommentText, setNewCommentText] = useState<string>("");
+
   const publishedDateFormated = format(
     props.publishedAt,
     "d 'de' LLLL 'às' HHmm'h'"
   );
 
   const publishedDateRelativeToNow = formatDistanceToNow(props.publishedAt);
+
+  function deleteComment(comment: string): void {
+    setComments((previous) => previous.filter((item) => item !== comment));
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setComments((prev) => [...prev, newCommentText]);
+    setNewCommentText("");
+  }
 
   return (
     <article className={styles.post}>
@@ -53,18 +67,30 @@ export function Post(props: Props) {
           })}
       </div>
 
-      <form className={styles.commentForm}>
+      <form onSubmit={handleSubmit} className={styles.commentForm}>
         <strong>Deixe o seu feedback</strong>
-        <textarea placeholder="Deixe o seu comentário" />
+        <textarea
+          placeholder="Deixe o seu comentário"
+          onChange={(e) => setNewCommentText(e.target.value)}
+          value={newCommentText}
+          required
+        />
         <footer>
-          <button type="submit">Publicar</button>
+          <button type="submit" disabled={newCommentText.length === 0}>
+            Publicar
+          </button>
         </footer>
       </form>
 
       <div className={styles.commentList}>
-        <Comment />
-        <Comment />
-        <Comment />
+        {comments &&
+          comments.map((comment, index) => (
+            <Comment
+              key={index}
+              content={comment}
+              onDeleteComment={deleteComment}
+            />
+          ))}
       </div>
     </article>
   );
